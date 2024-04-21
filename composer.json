@@ -1,0 +1,35 @@
+{
+    "name": "k1ttyf/geospy-php",
+    "description": "The Unofficial GeoSpy API PHP SDK",
+    "license": "MIT",
+    "type": "library",
+    "keywords": [
+        "geospy",
+        "geospy api",
+        "geospy php",
+        "geospy sdk",
+        "geospy api php",
+        "geospy api sdk",
+        "geospy api php sdk"
+    ],
+    "authors": [
+        {
+            "name": "k1ttyf",
+            "email": "k1ttyf@riseup.net",
+            "homepage": "https://github.com/k1ttyf"
+        }
+    ],
+    "homepage": "https://github.com/k1ttyf/geospy-php",
+    "require": {
+        "php": ">=8.0",
+        "guzzlehttp/guzzle": "^7.5.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "k1ttyf\\GeoSpy\\": "src/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit tests"
+    }
+}
