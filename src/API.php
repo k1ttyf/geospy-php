@@ -38,9 +38,7 @@ class API {
      * @throws Exception
      */
     public function predict(string $image, ?int $top_k = null) : array {
-        if(!$this->checkImage($image))
-            Throw new Exception("You have provided an invalid image.");
-        $params = ["image" => base64_encode(file_get_contents($image))];
+        $params = ["image" => base64_encode($image)];
         if(!empty($top_k))
             $params["top_k"] = $top_k;
         return $this->sendRequest("POST", "/predict", $params);
@@ -56,14 +54,6 @@ class API {
             "google" => sprintf("https://www.google.com/maps/place/%s,%s", $latitude, $longitude),
             "yandex" => sprintf("https://yandex.ru/maps/?text=%s,%s", $latitude, $longitude)
         ];
-    }
-
-    /**
-     * Checking the photo for validity.
-     * @link https://dev.geospy.ai/docs/routes#predict
-     */
-    private function checkImage(string $imagePath) : bool {
-        return exif_imagetype($imagePath);
     }
 
     /**
