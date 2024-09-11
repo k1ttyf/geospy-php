@@ -33,27 +33,59 @@ class API {
     /**
      * This is the base GeoSpy geolocation prediction endpoint.
      * @link https://dev.geospy.ai/docs/routes#predict
-     * @param string $image The location of your photo.
+     * @param string $image Photo (file_get_contents or file path)
      * @param int|null $top_k The number of top predictions to return. Default is 5 but you can request up to 50 GPS location predictions.
-     * @throws Exception
+     * @throws \k1ttyf\GeoSpy\Exception
+     * @return array
      */
     public function predict(string $image, ?int $top_k = null) : array {
-        $params = ["image" => base64_encode($image)];
+        $params = ["image" => $this->validateFile($image)];
         if(!empty($top_k))
             $params["top_k"] = $top_k;
         return $this->sendRequest("POST", "/predict", $params);
     }
 
     /**
-     * Creating direct link to location in Google/Yandex Maps.
+     * This is the base GeoSpy geolocation prediction endpoint.
+     * @link https://dev.geospy.ai/docs/routes#geospy-basic-api-providing-a-simple-prediction-explanation-as-well-as-a-a-single-a-general-location-prediction
+     * @param string $image Photo (file_get_contents or file path)
+     * @throws \k1ttyf\GeoSpy\Exception
+     * @return array
+     */
+    public function predictV1(string $image) : array {
+        return $this->sendRequest("POST", "/predict_v1", ["image" => $this->validateFile($image)]);
+    }
+
+    /**
+     * Creating direct link to location in Google/Apple/Yandex/2GIS Maps.
      * @param float $latitude Latitude
      * @param float $longitude Longitude
+     * @return array
      */
     public function getLocationLinks(float $latitude, float $longitude) : array {
+        $coords = sprintf("%s,%s", $latitude, $longitude);
+        $invertedCoords = sprintf("%s,%s", $longitude, $latitude);
         return [
-            "google" => sprintf("https://www.google.com/maps/place/%s,%s", $latitude, $longitude),
-            "yandex" => sprintf("https://yandex.ru/maps/?text=%s,%s", $latitude, $longitude)
+            "google" => sprintf("https://www.google.com/maps/place/%s", $coords),
+            "apple" => sprintf("https://maps.apple.com/?sll=%s", $coords),
+            "yandex" => sprintf("https://yandex.ru/maps/?text=%s", $coords),
+            "2gis" => sprintf("https://2gis.ru/geo/%s", $invertedCoords)
         ];
+    }
+
+    /**
+     * This method getting image in Base64
+     * @param string $image Image or path to image
+     * @throws \k1ttyf\GeoSpy\Exception
+     * @return string
+     */
+    private function validateFile(string $image) : string {
+        if(file_exists($image)){
+            $image = @file_get_contents($image);
+            if(!$image)
+                Throw new Exception("File not exists");
+        }
+        return base64_encode($image);
     }
 
     /**
@@ -61,7 +93,8 @@ class API {
      * @param string $requestMethod HTTP Request Method.
      * @param string $method GeoSpy API Method.
      * @param array|null $params Request Body.
-     * @throws Exception
+     * @throws \k1ttyf\GeoSpy\Exception
+     * @return array
      */
     private function sendRequest(string $requestMethod, string $method, ?array $params = null) : array {
         try {
@@ -77,7 +110,8 @@ class API {
     /**
      * Checking for a response from the server.
      * @param string $response The API server response.
-     * @throws Exception
+     * @throws \k1ttyf\GeoSpy\Exception
+     * @return array
      */
     private function checkAnswer(string $response) : array {
         $decoded = json_decode($response, true);
