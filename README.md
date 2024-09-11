@@ -24,7 +24,7 @@ require_once __DIR__ . "/vendor/autoload.php";
 $GeoSpy = new k1ttyf\GeoSpy\API("YOUR_API_KEY");
 
 try {
-    $result = $GeoSpy->predict(file_get_contents($image));
+    $result = $GeoSpy->predict($image);
     foreach($result["geo_predictions"] as $value){
         echo "Latitude: " . $value["coordinates"][0] . PHP_EOL;
         echo "Longitude: " . $value["coordinates"][1] . PHP_EOL;
